@@ -76,16 +76,24 @@ pub fn remove_notifier(name: &str) -> Result<(), Box<dyn Error>> {
     }
 }
 
-pub fn register_cvar(name: &str) -> CVar {
+pub fn register_cvar(
+    name: &str, 
+    default_value: &str, 
+    description: &str,
+    searchable: bool,
+    has_min: bool,
+    min: f32,
+    has_max: bool,
+    max: f32,
+    save_to_cfg: bool,
+) -> CVar {
     let id = internal::bakkesmod().id();
-    let c_name = CString::new(name).unwrap();
-    let c_name: *const c_char = c_name.as_ptr();
-    let c_defval = CString::new("").unwrap();
-    let c_defval: *const c_char = c_defval.as_ptr();
-    let c_desc= CString::new("").unwrap();
-    let c_desc: *const c_char = c_desc.as_ptr();
+    let name = CString::new(name).unwrap().as_ptr();
+    let default_value = CString::new(default_value).unwrap().as_ptr();
+    let description = CString::new(description).unwrap().as_ptr();
+
     let cvar = unsafe {
-        RegisterCVar(id, c_name, c_defval, c_desc, true, false, 0.0, false, 0.0, false)
+        RegisterCVar(id, name, default_value, description, searchable, has_min, min, has_max, max, save_to_cfg)
     };
     CVar::new(cvar)
 }
