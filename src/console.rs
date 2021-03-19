@@ -88,9 +88,12 @@ pub fn register_cvar(
     save_to_cfg: bool,
 ) -> CVar {
     let id = internal::bakkesmod().id();
-    let name = CString::new(name).unwrap().as_ptr();
-    let default_value = CString::new(default_value).unwrap().as_ptr();
-    let description = CString::new(description).unwrap().as_ptr();
+    let name = CString::new(name).unwrap();
+    let name: *const c_char = name.as_ptr();
+    let default_value = CString::new(default_value).unwrap();
+    let default_value: *const c_char = default_value.as_ptr();
+    let description = CString::new(description).unwrap();
+    let description: *const c_char = description.as_ptr();
 
     let cvar = unsafe {
         RegisterCVar(id, name, default_value, description, searchable, has_min, min, has_max, max, save_to_cfg)
