@@ -60,7 +60,6 @@ pub trait VehiclePickup : Actor {
     }
     fn pickup(&self, car: CarWrapper) {
         unsafe {
-            log_console!("self {} | car {}", self.addr(), car.addr());
             VehiclePickup_TA_Pickup(self.addr(), car.addr());
         }
     }

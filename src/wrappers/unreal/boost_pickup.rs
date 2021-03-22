@@ -26,6 +26,7 @@ pub trait BoostPickup : VehiclePickup {
     }
     fn pickup(&self, car: CarWrapper) {
         unsafe {
+            log_console!("self {} | car {}", self.addr(), car.addr());
             VehiclePickup_Boost_TA_Pickup(self.addr(), car.addr());
         }
     }
