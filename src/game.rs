@@ -82,7 +82,6 @@ pub fn hook_event_with_caller_param<
     let wrapper_callback = Box::new(move |caller: usize, params: usize| {
         let obj_wrapper = T::new(caller);
         // Pass the caller's obj_wrapper back to the callback 
-        // TODO add params to it
         let param_wrapper = U::new(params);
         callback(Box::new(obj_wrapper), Box::new(param_wrapper));
     });
@@ -125,6 +124,9 @@ extern "C" fn hook_with_caller_callback(addr: usize, caller: usize, params: usiz
     // These params match the address of the params in our callback function 
     log_console!("callback called with caller {} | params {}", caller, params);
     closure(caller, params);
+
+    // What is the point of this?
+    // TODO Investigate this later
     let _ = Box::into_raw(closure);
 }
 
