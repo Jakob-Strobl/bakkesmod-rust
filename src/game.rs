@@ -122,7 +122,8 @@ fn hook_event_with_caller_internal(name: &str, callback: Box<HookWithCallerCallb
 // Wtf is this doing?
 extern "C" fn hook_with_caller_callback(addr: usize, caller: usize, params: usize) {
     let mut closure = unsafe { Box::from_raw(addr as *mut Box<HookWithCallerCallbackInternal>) };
-    log_console!("callback called with params {}", params);
+    // These params match the address of the params in our callback function 
+    log_console!("callback called with caller {} | params {}", caller, params);
     closure(caller, params);
     let _ = Box::into_raw(closure);
 }
