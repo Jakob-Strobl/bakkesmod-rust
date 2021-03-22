@@ -79,10 +79,14 @@ pub fn hook_event_with_caller_param<
     T: Object + 'static,
     U: Object + 'static
 >(name: &str, mut callback: Box<HookWithCallerCallbackParam<T, U>>) {
+    // The template callback function calls this box'd closure 
+    // It provides the caller and the params 
     let wrapper_callback = Box::new(move |caller: usize, params: usize| {
         let obj_wrapper = T::new(caller);
-        // Pass the caller's obj_wrapper back to the callback 
+        // Idk if this is correct for param
         let param_wrapper = U::new(params);
+
+        // Pass the caller's obj_wrapper back to the callback 
         callback(Box::new(obj_wrapper), Box::new(param_wrapper));
     });
 
@@ -108,7 +112,7 @@ fn hook_event_with_caller_internal(name: &str, callback: Box<HookWithCallerCallb
     let id = bm.id();
     let c_name = CString::new(name).unwrap();
     let c_name: *const c_char = c_name.as_ptr();
-    // Casting fn pointer as usize. But why? 
+    // Casting fn pointer as usize. This is the general callback function to interface with C-code 
     let c_callback = hook_with_caller_callback as usize;
 
     if post {
@@ -118,8 +122,9 @@ fn hook_event_with_caller_internal(name: &str, callback: Box<HookWithCallerCallb
     }
 }
 
-// Wtf is this doing?
+// Template callback function that allows us to callback custom idiomatic rust functions 
 extern "C" fn hook_with_caller_callback(addr: usize, caller: usize, params: usize) {
+    // Create a function to invoke the callback function in addr
     let mut closure = unsafe { Box::from_raw(addr as *mut Box<HookWithCallerCallbackInternal>) };
     // These params match the address of the params in our callback function 
     log_console!("callback called with caller {} | params {}", caller, params);
