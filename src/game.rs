@@ -109,6 +109,7 @@ fn hook_event_with_caller_internal(name: &str, callback: Box<HookWithCallerCallb
     let id = bm.id();
     let c_name = CString::new(name).unwrap();
     let c_name: *const c_char = c_name.as_ptr();
+    // Casting fn pointer as usize. But why? 
     let c_callback = hook_with_caller_callback as usize;
 
     if post {
@@ -118,8 +119,10 @@ fn hook_event_with_caller_internal(name: &str, callback: Box<HookWithCallerCallb
     }
 }
 
+// Wtf is this doing?
 extern "C" fn hook_with_caller_callback(addr: usize, caller: usize, params: usize) {
     let mut closure = unsafe { Box::from_raw(addr as *mut Box<HookWithCallerCallbackInternal>) };
+    log_console!("callback called with params {}", params);
     closure(caller, params);
     let _ = Box::into_raw(closure);
 }
