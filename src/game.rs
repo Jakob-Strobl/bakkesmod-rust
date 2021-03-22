@@ -5,6 +5,7 @@ use crate::internal;
 use crate::internal::{
     HookCallback,
     HookWithCallerCallback,
+    HookWithCallerCallbackParam,
     HookWithCallerCallbackInternal,
     DrawableCallback,
     TimeoutCallback
@@ -66,7 +67,24 @@ pub fn unhook_event(name: &str) {
 pub fn hook_event_with_caller<T: Object + 'static>(name: &str, mut callback: Box<HookWithCallerCallback<T>>) {
     let wrapper_callback = Box::new(move |caller: usize, _params: usize| {
         let obj_wrapper = T::new(caller);
+        // Pass the caller's obj_wrapper back to the callback 
+        // TODO add params to it
         callback(Box::new(obj_wrapper));
+    });
+
+    hook_event_with_caller_internal(name, wrapper_callback, false);
+}
+
+pub fn hook_event_with_caller_param<
+    T: Object + 'static,
+    U: Object + 'static
+>(name: &str, mut callback: Box<HookWithCallerCallbackParam<T, U>>) {
+    let wrapper_callback = Box::new(move |caller: usize, params: usize| {
+        let obj_wrapper = T::new(caller);
+        // Pass the caller's obj_wrapper back to the callback 
+        // TODO add params to it
+        let param_wrapper = U::new(params);
+        callback(Box::new(obj_wrapper), Box::new(param_wrapper));
     });
 
     hook_event_with_caller_internal(name, wrapper_callback, false);

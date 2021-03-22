@@ -5,6 +5,7 @@ use crate::wrappers::cvar::CVar;
 
 pub type HookCallback = dyn FnMut();
 pub type HookWithCallerCallback<T> = dyn FnMut(Box<T>);
+pub type HookWithCallerCallbackParam<T, U> = dyn FnMut(Box<T>, Box<U>);
 pub type HookWithCallerCallbackInternal = dyn FnMut(usize, usize);
 pub type DrawableCallback = dyn FnMut(Canvas);
 pub type TimeoutCallback = dyn FnMut();
