@@ -1,4 +1,4 @@
-use std::ffi::CString;
+use std::{ffi::{CString, c_void}, usize};
 use std::os::raw::c_char;
 
 use crate::internal;
@@ -123,12 +123,15 @@ fn hook_event_with_caller_internal(name: &str, callback: Box<HookWithCallerCallb
 }
 
 // Template callback function that allows us to callback custom idiomatic rust functions 
-extern "C" fn hook_with_caller_callback(addr: usize, caller: usize, params: usize) {
+extern "C" fn hook_with_caller_callback(addr: usize, caller: usize, params: *const c_void) {
     // Create a function to invoke the callback function in addr
     let mut closure = unsafe { Box::from_raw(addr as *mut Box<HookWithCallerCallbackInternal>) };
-    // These params match the address of the params in our callback function 
-    log_console!("callback called with caller {} | params {}", caller, params);
-    closure(caller, params);
+
+    unsafe {
+        // These params match the address of the params in our callback function 
+        log_console!("callback called with caller {} | params {}", caller, *params.cast::<usize>());
+        closure(caller, *params.cast::<usize>());
+    }
 
     // What is the point of this?
     // TODO Investigate this later
