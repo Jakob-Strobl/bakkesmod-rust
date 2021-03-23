@@ -123,20 +123,20 @@ fn hook_event_with_caller_internal(name: &str, callback: Box<HookWithCallerCallb
 }
 
 // Template callback function that allows us to callback custom idiomatic rust functions 
-extern "C" fn hook_with_caller_callback(addr: *const c_void, caller: *const c_void, params: *const c_void) {
+unsafe extern "C" fn hook_with_caller_callback(addr: *const c_void, caller: *const c_void, params: *const c_void) {
     // Create a function to invoke the callback function in addr
-    let mut closure = unsafe { Box::from_raw(addr as *mut Box<HookWithCallerCallbackInternal>) };
+    let mut closure = Box::from_raw(addr as *mut Box<HookWithCallerCallbackInternal>) ;
 
-    unsafe {
-        // These params match the address of the params in our callback function 
-        log_console!("callback called with caller {} | params {}", caller as usize, *params.cast::<usize>());
-        closure(caller as usize, *params.cast::<usize>());
-    }
+    // These params match the address of the params in our callback function 
+    // log_console!("callback called with caller {} | params {}", caller as usize, *params.cast::<usize>());
+    // The caller c_void ptr points directly to the caller object
+    // The param c_void ptr points indirectly to the parameter object (double ptr?)
+    closure(caller as usize, *params.cast::<usize>());
 
-    // What is the point of this?
-    // Keeps the memory allocated, it is not dropped by rust and needs to be handled manually 
+    // Keeps the memory allocated; it is not dropped by rust and needs to be handled manually 
     let _ = Box::into_raw(closure);
 }
+
 
 pub fn register_drawable(callback: Box<DrawableCallback>) {
     let callback = Box::new(callback);
