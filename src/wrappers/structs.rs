@@ -65,7 +65,7 @@ impl RLString {
 }
 
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct Vector {
     x: f32,
@@ -103,7 +103,7 @@ impl ops::Add for Vector {
 
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Vector2 {
     x: i32,
     y: i32
@@ -131,7 +131,7 @@ impl ops::Add for Vector2 {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Vector2f {
     x: f32,
     y: f32
@@ -156,7 +156,7 @@ impl From<Vector2> for Vector2f {
 }
 
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct Rotator {
     pitch: i32,
@@ -175,7 +175,7 @@ impl Rotator {
 }
 
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 #[repr(align(16))]
 pub struct Quat {
@@ -196,7 +196,7 @@ impl Quat {
 }
 
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 pub struct Color {
     r: u8,
@@ -216,7 +216,7 @@ impl Color {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct LinearColor {
     r: f32,
     g: f32,
@@ -237,7 +237,7 @@ impl LinearColor {
 
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct ReplicatedRBState {
     quat: Quat,
     loc: Vector,
@@ -264,7 +264,7 @@ impl ReplicatedRBState {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct VehicleInputs {
     throttle: f32,
     steer: f32,
@@ -302,7 +302,7 @@ impl VehicleInputs {
 
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct SkillRating {
     mu: f32,
     sigma: f32
@@ -316,7 +316,7 @@ impl SkillRating {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct SkillRank {
     tier: i32,
     division: i32,
@@ -332,7 +332,7 @@ impl SkillRank {
 
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct UniqueNetId {
     id: u64
 }
@@ -349,7 +349,7 @@ impl UniqueNetId {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct WheelContactData {
     contact_info: u32, // TODO: use bitfields
     has_contact_change_time: f32,
@@ -381,7 +381,7 @@ impl WheelContactData {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct POV {
     location: Vector,
     rotation: Rotator,
@@ -400,7 +400,7 @@ impl POV {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct PredictionInfo {
 	time: f32,
 	arch_top_time: f32,
@@ -427,7 +427,7 @@ impl PredictionInfo {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct TViewTarget {
     target: usize,
     controller: usize,
@@ -450,7 +450,7 @@ impl TViewTarget {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct WorldContactData {
     has_contact: u32,
     location: Vector,
@@ -471,7 +471,7 @@ impl WorldContactData {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Double(f64);
 impl_unreal_pointer_struct!(Double);
 
@@ -482,7 +482,7 @@ impl Double {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Sample {
     low: f32,
     high: f32
@@ -496,7 +496,7 @@ impl Sample {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct StickyForceData {
     ground: f32,
     wall: f32
@@ -510,7 +510,7 @@ impl StickyForceData {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct ProfileCameraSettings {
     fov: f32,
     height: f32,

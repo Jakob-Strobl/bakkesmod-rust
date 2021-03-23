@@ -1,10 +1,11 @@
-use std::ffi::CString;
+use std::{ffi::{CString, c_void}, usize};
 use std::os::raw::c_char;
 
 use crate::internal;
 use crate::internal::{
     HookCallback,
     HookWithCallerCallback,
+    HookWithCallerCallbackParam,
     HookWithCallerCallbackInternal,
     DrawableCallback,
     TimeoutCallback
@@ -66,7 +67,27 @@ pub fn unhook_event(name: &str) {
 pub fn hook_event_with_caller<T: Object + 'static>(name: &str, mut callback: Box<HookWithCallerCallback<T>>) {
     let wrapper_callback = Box::new(move |caller: usize, _params: usize| {
         let obj_wrapper = T::new(caller);
+        // Pass the caller's obj_wrapper back to the callback 
+        // TODO add params to it
         callback(Box::new(obj_wrapper));
+    });
+
+    hook_event_with_caller_internal(name, wrapper_callback, false);
+}
+
+pub fn hook_event_with_caller_param<
+    T: Object + 'static,
+    U: Object + 'static
+>(name: &str, mut callback: Box<HookWithCallerCallbackParam<T, U>>) {
+    // The template callback function calls this box'd closure 
+    // It provides the caller and the params 
+    let wrapper_callback = Box::new(move |caller: usize, params: usize| {
+        let obj_wrapper = T::new(caller);
+        // Idk if this is correct for param
+        let param_wrapper = U::new(params);
+
+        // Pass the caller's obj_wrapper back to the callback 
+        callback(Box::new(obj_wrapper), Box::new(param_wrapper));
     });
 
     hook_event_with_caller_internal(name, wrapper_callback, false);
@@ -91,6 +112,7 @@ fn hook_event_with_caller_internal(name: &str, callback: Box<HookWithCallerCallb
     let id = bm.id();
     let c_name = CString::new(name).unwrap();
     let c_name: *const c_char = c_name.as_ptr();
+    // Casting fn pointer as usize. This is the general callback function to interface with C-code 
     let c_callback = hook_with_caller_callback as usize;
 
     if post {
@@ -100,11 +122,21 @@ fn hook_event_with_caller_internal(name: &str, callback: Box<HookWithCallerCallb
     }
 }
 
-extern "C" fn hook_with_caller_callback(addr: usize, caller: usize, params: usize) {
-    let mut closure = unsafe { Box::from_raw(addr as *mut Box<HookWithCallerCallbackInternal>) };
-    closure(caller, params);
+// Template callback function that allows us to callback custom idiomatic rust functions 
+unsafe extern "C" fn hook_with_caller_callback(addr: *const c_void, caller: *const c_void, params: *const c_void) {
+    // Create a function to invoke the callback function in addr
+    let mut closure = Box::from_raw(addr as *mut Box<HookWithCallerCallbackInternal>) ;
+
+    // These params match the address of the params in our callback function 
+    // log_console!("callback called with caller {} | params {}", caller as usize, *params.cast::<usize>());
+    // The caller c_void ptr points directly to the caller object
+    // The param c_void ptr points indirectly to the parameter object (double ptr?)
+    closure(caller as usize, *params.cast::<usize>());
+
+    // Keeps the memory allocated; it is not dropped by rust and needs to be handled manually 
     let _ = Box::into_raw(closure);
 }
+
 
 pub fn register_drawable(callback: Box<DrawableCallback>) {
     let callback = Box::new(callback);
