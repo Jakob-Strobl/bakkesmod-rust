@@ -66,6 +66,10 @@ pub trait Car : Vehicle {
         unsafe { Car_Demolish(self.addr()); }
     }
 
+    fn demolish2(&self, demolisher: usize, demo_fx: usize) {
+        unsafe { Car_TA_Demolish(self.addr(), demolisher, demo_fx) }
+    }
+
     fn has_flip(&self) -> u64 {
         unsafe { Car_HasFlip(self.addr()) }
     }
